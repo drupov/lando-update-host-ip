@@ -10,11 +10,18 @@ containerip=`lando ssh -c "printenv LANDO_HOST_IP"`
 # Remove the last character from the received value.
 containerip=${containerip%?}
 
-# Stop the docker service.
-sudo service docker stop
-# Replace the IP with the new one for all docker containers.
-sudo find /var/lib/docker/containers -type f -name "*" -exec sed -i'' -e "s/$containerip/$hostip/g" {} +
-# Start the docker service.
-sudo service docker start
-# Restart the app after the docker restart.
-lando restart
+if [ $hostip != $containerip ]
+then
+	echo "Updating host ip in container..."
+	echo "You might be asked for the sudo password, as it is needed to stop/start docker and change its configuration."
+	# Stop the docker service.
+	sudo service docker stop
+	# Replace the IP with the new one for all docker containers.
+	sudo find /var/lib/docker/containers -type f -name "*" -exec sed -i'' -e "s/$containerip/$hostip/g" {} +
+	# Start the docker service.
+	sudo service docker start
+	# Restart the app after the docker restart.
+	lando restart
+else
+	echo "No change needed."
+fi
