@@ -4,11 +4,15 @@
 hostip=`lando config --path appEnv.LANDO_HOST_IP`
 # Strip the quotes from the output.
 hostip=`echo $hostip | cut -d "'" -f 2`
+# Debug
+echo "Host IP: $hostip"
 
 # Get the current value of the LANDO_HOST_IP within the contaner.
 containerip=`lando ssh -c "printenv LANDO_HOST_IP"`
 # Remove the last character from the received value.
 containerip=${containerip%?}
+# Debug
+echo "Container IP: $containerip"
 
 if [ $hostip != $containerip ]
 then
